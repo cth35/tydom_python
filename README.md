@@ -1,6 +1,6 @@
 # tydom_python
 
-Example of Python Code to manage Tydom (Delta Dore) devices<br />
+Example of Python Code (Python >= 3.5) to manage Tydom (Delta Dore) devices<br />
 Need Tydom Gateway (I've used a Tydom 1.0)<br />
 Code Reversed Engineered<br />
 <br />
