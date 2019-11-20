@@ -2,7 +2,7 @@
 
 Example of Python Code (Python >= 3.5) to manage Tydom (Delta Dore) devices<br />
 Need Tydom Gateway (I've used a Tydom 1.0)<br />
-Code Reversed Engineered<br />
+Code Reversed Engineered with help of Eli (JeeDore plugin for Jeedom creator)<br />
 <br />
 Modules requires :
     
