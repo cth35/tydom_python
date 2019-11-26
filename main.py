@@ -24,6 +24,7 @@ password = "The password of your tydom"
 host = "mediation.tydom.com" #"192.168.0.20"
 device_dict = dict()
 
+# Set Host, ssl context and prefix for remote or local connection
 if host == "mediation.tydom.com":
     remote_mode = True
     ssl_context = None
@@ -61,6 +62,7 @@ def put_response_from_bytes(data):
     request = HTTPRequest(data)
     return request
 
+# Basic response parsing. Typically GET responses
 def parse_response(bytes_str, type=None):
     try:
         response = response_from_bytes(bytes_str[len(cmd_prefix):])
@@ -95,6 +97,7 @@ def parse_response(bytes_str, type=None):
         print('Cannot parse response')
         print(e)
 
+# PUT response DIRTY parsing
 def parse_put_response(bytes_str):
     # TODO : Find a cooler way to parse nicely the PUT HTTP response
     resp = bytes_str[len(cmd_prefix):].decode("utf-8")
@@ -113,10 +116,11 @@ def parse_put_response(bytes_str):
     parsed = json.loads(output)
     print(json.dumps(parsed, sort_keys=True, indent=4, separators=(',', ': ')))
 
+# Generate 16 bytes random key for Sec-WebSocket-Keyand convert it to base64
 def generate_random_key():
-    # Generate 16 bytes random key for Sec-WebSocket-Keyand convert it t base64
     return base64.b64encode(os.urandom(16))
 
+# Build the headers of Digest Authentication
 def build_digest_headers(nonce):
     digestAuth = HTTPDigestAuth(login, password)
     chal = dict()
@@ -128,30 +132,50 @@ def build_digest_headers(nonce):
     digestAuth._thread_local.nonce_count = 1
     return digestAuth.build_digest_header('GET', "https://{}:443/mediation/client?mac={}&appli=1".format(host, mac))
 
+# Get pretty name for a device id
 def get_name_from_id(id):
     name = ""
     if len(device_dict) != 0:
         name = device_dict[id]
     return(name)
 
+# Send Generic GET message
 async def send_message(websocket, msg):
     str = cmd_prefix + "GET " + msg +" HTTP/1.1\r\nContent-Length: 0\r\nContent-Type: application/json; charset=UTF-8\r\nTransac-Id: 0\r\n\r\n"
     a_bytes = bytes(str, "ascii")
     await websocket.send(a_bytes)
     return await websocket.recv()
 
+###############################################################
+# Commands                                                    #
+###############################################################
+
+# Get some information on Tydom
 async def get_info(websocket):
     msg_type = '/info'
     parse_response(await send_message(websocket, msg_type), msg_type)
 
+# Get the moments (programs)
+async def get_moments(websocket):
+    msg_type = '/moments/file'
+    parse_response(await send_message(websocket, msg_type), msg_type)
+
+# Get the scenarios
+async def get_scenarios(websocket):
+    msg_type = '/scenarios/file'
+    parse_response(await send_message(websocket, msg_type), msg_type)
+
+# Get a ping (pong should be returned)
 async def get_ping(websocket):
     msg_type = 'ping'
     parse_response(await send_message(websocket, msg_type), msg_type)
 
+# Get all devices metadata
 async def get_devices_meta(websocket):
     msg_type = '/devices/meta'
     parse_response(await send_message(websocket, msg_type), msg_type)
 
+# Get all devices data
 async def get_devices_data(websocket):
     msg_type = '/devices/data'
     parse_response(await send_message(websocket, msg_type), msg_type)
@@ -161,7 +185,7 @@ async def get_configs_file(websocket):
     msg_type = '/configs/file'
     parse_response(await send_message(websocket, msg_type), msg_type)
 
-# Give order to endpoint
+# Give order (name + value) to endpoint
 async def put_devices_data(websocket, endpoint_id, name, value):
     # For shutter, value is the percentage of closing
     body="[{\"name\":\"" + name + "\",\"value\":\""+ value + "\"}]"
@@ -177,6 +201,16 @@ async def put_devices_data(websocket, endpoint_id, name, value):
     except:
         parse_put_response(name)
 
+# Run scenario
+async def put_scenarios(websocket, scenario_id):
+    body=""
+    # scenario_id is the id of scenario got from the get_scenarios command
+    str_request = cmd_prefix + "PUT /scenarios/{} HTTP/1.1\r\nContent-Length: ".format(str(scenario_id))+str(len(body))+"\r\nContent-Type: application/json; charset=UTF-8\r\nTransac-Id: 0\r\n\r\n"+body+"\r\n\r\n"
+    a_bytes = bytes(str_request, "ascii")
+    await websocket.send(a_bytes)
+    name = await websocket.recv()
+    parse_response(name)
+
 # Give order to endpoint
 async def get_device_data(websocket, id):
     # 10 here is the endpoint = the device (shutter in this case) to open.
@@ -186,6 +220,7 @@ async def get_device_data(websocket, id):
     name = await websocket.recv()
     parse_response(name)
 
+# Main async task
 @asyncio.coroutine
 async def main_task():
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -221,13 +256,28 @@ async def main_task():
     async with websockets.client.connect('wss://{}:443/mediation/client?mac={}&appli=1'.format(host, mac),
                                          extra_headers=websocketHeaders, ssl=websocket_ssl_context) as websocket:
 
+        # Get informations (not very useful)
         #await get_info(websocket)
+
+        # Get all moments stored on Tydom
+        #await get_moments(websocket)
+
+        # Get scenarios ids
+        await get_scenarios(websocket)
+
+        # Run scenario with scn id returned in previous command
+        await put_scenarios(websocket, 15)
+
         #await get_configs_file(websocket)
         #await get_devices_meta(websocket)
+
         # Get data of all device
         #await get_devices_data(websocket)
+
         # Get data of a specific device
-        await get_device_data(websocket, 9)
+        #await get_device_data(websocket, 9)
+
+        # Set a shutter position to 10%
         #await put_devices_data(websocket, 9, "position", "10.0")
         # TODO : Wait hardcoded for now to put response from websocket server
         #time.sleep(45)
