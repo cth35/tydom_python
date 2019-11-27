@@ -24,7 +24,7 @@ password = "The password of your tydom"
 # alarmMode  : ON or ZONE or OFF
 # alarmState : ON = Triggered
 # alarmSOS   : true = SOS triggered
-deviceAlarmKeywords = ['alarmMode','alarmState','alarmSOS','zone1State','zone2State','zone3State','zone4State','zone5State','zone6State','zone7State','zone8State','gsmLevel','inactiveProduct','zone1State','liveCheckRunning','networkDefect','unitAutoProtect','unitBatteryDefect','unackedEvent','alarmTechnical','systAutoProtect','sysBatteryDefect','zsystSupervisionDefect','systOpenIssue','systTechnicalDefect','videoLinkDefect']
+deviceAlarmKeywords = ['alarmMode','alarmState','alarmSOS','zone1State','zone2State','zone3State','zone4State','zone5State','zone6State','zone7State','zone8State','gsmLevel','inactiveProduct','zone1State','liveCheckRunning','networkDefect','unitAutoProtect','unitBatteryDefect','unackedEvent','alarmTechnical','systAutoProtect','sysBatteryDefect','systSupervisionDefect','systOpenIssue','systTechnicalDefect','videoLinkDefect','simDefect','remoteSurveyDefect']
 
 # Local ip address or mediation.tydom.com for remote connexion
 host = "mediation.tydom.com" #"192.168.0.20"
