@@ -20,8 +20,16 @@ mac = "The mac address (16 bytes) of your Tydom like : AB00AB00AB00AB"
 login = mac
 password = "The password of your tydom"
 
+# Alarm available keywords
+# alarmMode  : ON or ZONE or OFF
+# alarmState : ON = Triggered
+# alarmSOS   : true = SOS triggered
+deviceAlarmKeywords = ['alarmMode','alarmState','alarmSOS','zone1State','zone2State','zone3State','zone4State','zone5State','zone6State','zone7State','zone8State','gsmLevel','inactiveProduct','zone1State','liveCheckRunning','networkDefect','unitAutoProtect','unitBatteryDefect','unackedEvent','alarmTechnical','systAutoProtect','sysBatteryDefect','zsystSupervisionDefect','systOpenIssue','systTechnicalDefect','videoLinkDefect']
+
 # Local ip address or mediation.tydom.com for remote connexion
 host = "mediation.tydom.com" #"192.168.0.20"
+
+# Device dict for parsing
 device_dict = dict()
 
 # Set Host, ssl context and prefix for remote or local connection
@@ -76,20 +84,29 @@ def parse_response(bytes_str, type=None):
                         print('{} {}'.format(i["id_endpoint"],i["name"]))
                         device_dict[i["id_endpoint"]] = i["name"]
                         # TODO get other device type
+                    if i["last_usage"] == 'alarm':
+                        print('{} {}'.format(i["id_endpoint"], i["name"]))
             elif type == '/devices/data':
                 for i in parsed:
                     if i["endpoints"][0]["error"] == 0:
                         for elem in i["endpoints"][0]["data"]:
+                            # Get full name of this id
+                            endpoint_id = i["endpoints"][0]["id"]
+                            # Element name
+                            elementName = elem["name"]
+                            # Element value
+                            elementValue = elem["value"]
                             # Get last known position (for shutter)
-                            if elem["name"] == 'position':
-                                # Get full name of this id
-                                endpoint_id = i["endpoints"][0]["id"]
+                            if elementName == 'position':
                                 name_of_id = get_name_from_id(endpoint_id)
                                 if len(name_of_id) != 0:
                                     print_id = name_of_id
                                 else:
                                     print_id = endpoint_id
-                                print('{} : {}'.format(print_id,elem["value"]))
+                                print('{} : {}'.format(print_id, elementValue))
+                            # Get last known position (for alarm)
+                            if elementName in deviceAlarmKeywords:
+                                print('{} : {} : {}'.format(endpoint_id, elementName, elementValue))
             else:
                 # Default json dump
                 print(json.dumps(parsed, sort_keys=True, indent=4, separators=(',', ': ')))
