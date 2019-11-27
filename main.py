@@ -21,8 +21,8 @@ login = mac
 password = "The password of your tydom"
 
 # Alarm available keywords
-# alarmMode  : ON or ZONE or OFF
-# alarmState : ON = Triggered
+# alarmMode  : ON or ZONE or OFF or TEST or MAINTENANCE
+# alarmState : ON or OFF or DELAYED or QUIET
 # alarmSOS   : true = SOS triggered
 deviceAlarmKeywords = ['alarmMode','alarmState','alarmSOS','zone1State','zone2State','zone3State','zone4State','zone5State','zone6State','zone7State','zone8State','gsmLevel','inactiveProduct','zone1State','liveCheckRunning','networkDefect','unitAutoProtect','unitBatteryDefect','unackedEvent','alarmTechnical','systAutoProtect','sysBatteryDefect','zsystSupervisionDefect','systOpenIssue','systTechnicalDefect','videoLinkDefect']
 
