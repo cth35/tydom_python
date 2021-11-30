@@ -8,14 +8,36 @@ Code Reversed Engineered with help of Eli (creator of JeeDore plugin for Jeedom)
 
     pip install websockets requests
   
-Run:  
+## Run with Docker:
+Configure env:
+```
+    cp .env.default .env
+```
+
+Build docker image:
+```
+    ./scripts/build.sh
+```
+
+Run:
+```
+    ./scripts/run.sh
+```
+
+## Run without Docker:
+Configure env:
+```
+    cp .env.default .env
+```
+
+Run:
 ```
     pip install -r requirements.txt
     python sources/main.py
 ```
   
 Following commands are implemented :  
-  
+
 **get_info**  
 Get some information on tydom (version ...)  
 **get_ping**  
@@ -28,3 +50,11 @@ Get the data on the devices
 This one get the list of device declared on your tydom  
 **put_devices_data**  
 Give order to Tydom endpoint  
+
+## Sources: 
+- https://github.com/cth35/tydom_python
+- https://github.com/WiwiWillou/tydom_python
+- https://github.com/largotef/tydom_python
+- https://github.com/mgcrea/node-tydom-client
+- https://community.home-assistant.io/t/tydom2mqtt-make-delta-dore-devices-home-assistant-compatible/154439
+
